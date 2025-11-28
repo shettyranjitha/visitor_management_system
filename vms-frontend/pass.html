@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visitor Pass</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 380px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .card h2 {
+      color: #28a745;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    .card p {
+      font-size: 16px;
+      color: #333;
+      margin: 8px 0;
+    }
+
+    .icon {
+      font-size: 60px;
+      color: #28a745;
+      margin-bottom: 10px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="icon">✅</div>
+    <div id="passInfo">
+      <h2>Loading your Visitor Pass...</h2>
+    </div>
+    <div class="footer">
+      Thank you for visiting!
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const visitorId = params.get("id");
+
+    async function loadVisitorDetails() {
+      if (!visitorId) {
+        document.getElementById("passInfo").innerHTML = "<p>Invalid visitor ID.</p>";
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/visitors/${visitorId}`);
+        const data = await res.json();
+
+        if (data.visitor) {
+          const v = data.visitor;
+          document.getElementById("passInfo").innerHTML = `
+            <h2>Your Visitor Pass has been approved 🎉</h2>
+            <p><b>Approved By:</b> ${v.visitingPerson.name}</p>
+            <p><b>Company:</b> ${v.visitingCompany.companyName}</p>
+            <p><b>Duration:</b> ${v.duration || "N/A"} minutes</p>
+            <p><b>Date:</b> ${new Date(v.updatedAt).toLocaleString()}</p>
+          `;
+        } else {
+          document.getElementById("passInfo").innerHTML = "<p>Visitor not found.</p>";
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById("passInfo").innerHTML = "<p>Error loading visitor details.</p>";
+      }
+    }
+
+    loadVisitorDetails();
+  </script>
+</body>
+</html>

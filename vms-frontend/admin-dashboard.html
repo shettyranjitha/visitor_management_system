@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | Smart VMS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 30px 20px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar h2 {
+      font-size: 22px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .menu a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 15px;
+      border-radius: 10px;
+      transition: 0.3s;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .menu a:hover {
+      background: #00ffe1;
+      color: #000;
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 30px;
+      color: #fff;
+      overflow-y: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .topbar h1 {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      padding: 10px 18px;
+      background: #6a6767;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #8c8989e8;
+    }
+
+    /* Cards */
+    .stats-boxes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .card h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .table-section h2 {
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sidebar">
+    <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
+
+    <div class="menu">
+      <a><i class="fa-solid fa-gauge"></i> Dashboard</a>
+      <a onclick="window.location='add-company.html'"><i class="fa-solid fa-building"></i> Add Company</a>
+      <a onclick="window.location='add-host.html'"><i class="fa-solid fa-user-tie"></i> Add Host</a>
+      <a href="#visitors"><i class="fa-solid fa-users"></i> Visitors</a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Admin Dashboard</h1>
+      <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+
+    <div class="stats-boxes">
+      <div class="card"><h3>Total Visitors</h3><p id="visitorCount">0</p></div>
+      <div class="card"><h3>Total Hosts</h3><p id="hostCount">0</p></div>
+      <div class="card"><h3>Total Companies</h3><p id="companyCount">0</p></div>
+    </div>
+
+    <div class="table-section" id="visitors">
+      <h2>Recent Visitors</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Photo</th>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Host</th>
+            <th>Check-In</th>
+          </tr>
+        </thead>
+        <tbody id="visitorTable">
+          <tr><td colspan="4" style="text-align:center;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    if (!localStorage.getItem("adminToken")) {
+      alert("Please login first!");
+      window.location = "admin-login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("adminToken");
+      window.location = "admin-login.html";
+    }
+
+    // Load Dashboard Data
+    async function loadDashboard() {
+      const token = localStorage.getItem("adminToken");
+
+      try {
+        //  FETCH COUNTS
+        const statsRes = await fetch("http://localhost:5000/api/admin/stats", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const stats = await statsRes.json();
+
+        document.getElementById("visitorCount").textContent = stats.totalVisitors || 0;
+        document.getElementById("hostCount").textContent = stats.totalHosts || 0;
+        document.getElementById("companyCount").textContent = stats.totalCompanies || 0;
+
+        // FETCH RECENT VISITORS
+        const recentRes = await fetch("http://localhost:5000/api/admin/recent-visitors", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const recent = await recentRes.json();
+
+        const table = document.getElementById("visitorTable");
+        table.innerHTML = "";
+
+        if (recent.length === 0) {
+          table.innerHTML = `<tr><td colspan="4" style="text-align:center;">No visitors found</td></tr>`;
+          return;
+        }
+
+        recent.forEach(v => {
+          table.innerHTML += `
+            <tr>
+               <td>
+        <img src="http://localhost:5000/uploads/${v.photo}"
+             style="width:45px; height:45px; border-radius:50%; object-fit:cover;"
+             onerror="this.src='default.jpg'">
+      </td>
+              <td>${v.name}</td>
+              <td>${v.visitingCompany?.companyName || "-"}</td>
+              <td>${v.visitingPerson?.name || "-"}</td>
+              <td>${new Date(v.createdAt).toLocaleString()}</td>
+            </tr>
+          `;
+        });
+
+      } catch (err) {
+        console.error("Dashboard Load Error:", err);
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Visitor Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #5A00FF, #00C6FF);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin-left: 30px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #00ffe1;
+    }
+
+    .hero {
+      margin-top: 120px;
+      text-align: center;
+      max-width: 700px;
+    }
+
+    .hero h2 {
+      font-size: 38px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #f1f1f1;
+      margin-bottom: 40px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto 60px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      padding: 30px 20px;
+      text-align: center;
+      transition: transform 0.3s ease, background 0.3s ease;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    .card:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-10px);
+    }
+
+    .card i {
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: #00ffe1;
+    }
+
+    .card h3 {
+      color: #fff;
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      background: rgba(0,0,0,0.1);
+      width: 100%;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Smart Visitor Management System</h1>
+    <nav>
+      <a href="admin-login.html">Admin</a>
+      <a href="host-login.html">Host</a>
+      <a href="visitor-form.html">Visitor</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Smart Visitor Management System</h2>
+    <p>Streamline and secure visitor management with our cutting-edge solution....</p>
+  </section>
+
+  <section class="cards">
+    <div class="card" onclick="location.href='admin-login.html'">
+      <i class="fa-solid fa-user-gear"></i>
+      <h3>Admin</h3>
+    </div>
+    <div class="card" onclick="location.href='host-login.html'">
+      <i class="fa-solid fa-user-tie"></i>
+      <h3>Host</h3>
+    </div>
+    <div class="card" onclick="location.href='visitor-form.html'">
+      <i class="fa-solid fa-user"></i>
+      <h3>Visitor</h3>
+    </div>
+  </section>
+
+  <footer>
+     @ Smart Visitor Management System.
+  </footer>
+</body>
+</html>

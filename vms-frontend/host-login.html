@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Host Login | Smart VMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #5A00FF, #00C6FF);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #fff;
+  }
+
+  .login-box {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 40px 30px;
+    width: 350px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    animation: fadeIn 0.6s ease-in-out;
+  }
+
+  .login-box h2 {
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .input-group {
+    position: relative;
+    margin: 20px 0;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: none;
+    border-radius: 30px;
+    outline: none;
+    font-size: 15px;
+    box-sizing: border-box;
+  }
+
+  .input-group i {
+    position: absolute;
+    right: 15px;
+    top: 13px;
+    color: #555;
+  }
+
+  .login-box button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    background: #00ffe1;
+    color: #000;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+  }
+
+  .login-box button:hover {
+    background: #fff;
+    color: #5A00FF;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  #msg {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffefef;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .back-link:hover {
+    color: #00ffe1;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+</head>
+<body>
+
+<div class="login-box">
+  <h2><i class="fa-solid fa-user-tie"></i> Host Login</h2>
+
+  <div class="input-group">
+    <input type="email" id="email" placeholder="Enter Email" required>
+    <i class="fa-solid fa-envelope"></i>
+  </div>
+
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Enter Password" required>
+    <i class="fa-solid fa-lock"></i>
+  </div>
+
+  <button onclick="loginHost()">Login</button>
+  <p id="msg"></p>
+
+  <a href="index.html" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to Home
+  </a>
+</div>
+
+
+<script>
+async function loginHost() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
+
+  msg.innerText = "";
+
+  if (!email || !password) {
+    msg.innerText = "Please enter email and password.";
+    return;
+  }
+
+  const res = await fetch("http://localhost:5000/api/host/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    msg.innerText = data.error || "Login failed";
+    msg.style.color = "#ffefef";
+    return;
+  }
+
+  msg.style.color = "#00ffe1";
+  msg.innerText = "Login successful! Redirecting...";
+
+  // Save token
+  localStorage.setItem("hostToken", data.token);
+
+  setTimeout(() => {
+    window.location.href = "host-dashboard.html";
+  }, 1000);
+}
+</script>
+
+</body>
+</html>

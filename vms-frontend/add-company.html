@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Company</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #986ee8, #00C6FF);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      width: 400px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      color: white;
+      
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0 20px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #abddf1;
+      color: black;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+     .cancel-btn {
+      width: 100%;
+      padding: 12px;
+      background: #abddf1;
+      color: #0a0909;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    .msg {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h3>Add Company</h3>
+
+  <form onsubmit="addCompany(event)">
+    <label>Company Name</label>
+    <input type="text" id="companyName" placeholder="Enter company name" required>
+
+    <label>Location</label>
+    <input type="text" id="location" placeholder="Enter location">
+
+    <button type="submit">Add Company</button>
+
+    <button type="button" class="cancel-btn" onclick="goBack()">Cancel</button>
+    <div class="msg" id="msg"></div>
+  </form>
+</div>
+
+<script>
+async function addCompany(e) {
+  e.preventDefault();
+
+  const companyName = document.getElementById("companyName").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const msg = document.getElementById("msg");
+
+  const token = localStorage.getItem("adminToken");
+  if (!token) {
+    msg.style.color = "yellow";
+    msg.textContent = "Unauthorized! Please login again.";
+    return;
+  }
+
+  const res = await fetch("http://localhost:5000/api/companies", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ companyName, location })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    msg.style.color = "#0AFFD1";
+    msg.textContent = "Company Added Successfully!....";
+
+    setTimeout(()=>{
+      window.location.href = "admin-dashboard.html";
+    },1000);
+
+  } else {
+    msg.style.color = "yellow";
+    msg.textContent = data.error || "Error adding company";
+  }
+}
+
+function goBack(){
+  window.location.href="admin-dashboard.html";
+}
+</script>
+
+</body>
+</html>

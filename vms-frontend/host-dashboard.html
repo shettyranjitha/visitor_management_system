@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Host Dashboard</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 0;
+    }
+
+    header {
+        background: #222;
+        color: #fff;
+        padding: 15px;
+        text-align: center;
+        font-size: 22px;
+    }
+
+    .container {
+        width: 90%;
+        margin: 20px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    /* Back Button */
+    .back-btn {
+        background: #a7bbd1;
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        display: inline-block;
+        margin-bottom: 15px;
+        cursor: pointer;
+    }
+
+    .back-btn:hover {
+        background: #9c9d9e;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    table, th, td {
+        border: 1px solid #ccc;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+    }
+
+    .btn-approve {
+        padding: 6px 12px;
+        background: #4CAF50; 
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer; 
+    }
+    .btn-reject{
+        padding: 6px 12px;
+        background: #e51e1e;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 5px;
+    }
+
+    .btn-approve:hover {
+        background: #1bf066;
+    }
+
+    .btn-reject:hover{
+        background: #ee5446;
+    }
+</style>
+</head>
+
+<body>
+
+<header>HOST DASHBOARD</header>
+
+<div class="container">
+
+ 
+    <a class="back-btn" href="host-login.html">⬅ Back</a>
+
+    <h2>Welcome Host 👋</h2>
+    <p>Below are your visitors waiting for approval:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Company</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="visitorTable"></tbody>
+    </table>
+</div>
+
+<script>
+const token = localStorage.getItem("hostToken");
+
+if (!token) {
+    alert("You must login first!");
+    window.location.href = "host-login.html";
+}
+
+async function loadVisitors() {
+    try {
+        const res = await fetch("http://localhost:5000/api/host/visitors", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+
+        const tableBody = document.getElementById("visitorTable");
+        tableBody.innerHTML = "";
+
+        data.forEach(visitor => {
+            const row = `
+    <tr>
+        <td>
+            <img src="http://localhost:5000/uploads/${visitor.photo}" 
+                 style="width:45px; height:45px; border-radius:50%; object-fit:cover;" 
+                 onerror="this.src='default.jpg'">
+        </td>
+        <td>${visitor.name}</td>
+        <td>${visitor.mobile}</td>
+        <td>${visitor.visitingCompany?.companyName || "N/A"}</td>
+        <td>${visitor.status}</td>
+        <td>
+    ${
+        visitor.status === "pending"
+            ? `
+                <button class="btn-approve" onclick="approveVisitor('${visitor._id}')">Approve</button>
+                <button class="btn-reject"  onclick="rejectVisitor('${visitor._id}')">Reject</button>
+              `
+            : visitor.status === "approved"
+                ? "Approved"
+                : "Rejected"
+    }
+    </td>
+    </tr>
+`;
+
+            tableBody.innerHTML += row;
+        });
+
+    } catch (err) {
+        console.log(err);
+        alert("Error loading visitors");
+    }
+}
+
+async function approveVisitor(id) {
+    const ok = confirm("Approve this visitor?");
+    if (!ok) return;
+
+    try {
+        const res = await fetch(`http://localhost:5000/api/host/approve/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+
+        if (data.error) return alert(data.error);
+
+        alert("Visitor Approved!");
+        loadVisitors();
+
+    } catch (err) {
+        console.log(err);
+        alert("Approval failed");
+    }
+}
+
+async function rejectVisitor(id) {
+    const ok = confirm("Reject this visitor?");
+    if (!ok) return;
+
+    try {
+        const res = await fetch(`http://localhost:5000/api/host/reject/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        const data = await res.json();
+
+        if(data.error) return alert(data.error);
+
+        alert("Visitor rejected!");
+        loadVisitors();
+
+    } catch (err) {
+        console.log(err);
+        alert("Rejection failed");
+    }
+}
+
+loadVisitors();
+</script>
+
+</body>
+</html>

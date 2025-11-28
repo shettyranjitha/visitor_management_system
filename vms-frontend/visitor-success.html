@@ -1,0 +1,226 @@
+<!-- 
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Visitor Added</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f2f2f2;
+      padding: 40px;
+    }
+
+    .box {
+      width: 550px;
+      background: white;
+      padding: 25px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Visitor Added Successfully!</h2>
+
+  <p><b>Name:</b> <span id="vName"></span></p>
+  <p><b>ID Proof:</b> <span id="vProof"></span></p>
+  <p><b>Status:</b> <span id="vStatus"></span></p>
+
+  <button onclick="window.print()">Print</button>
+  <br><br>
+  <button onclick="location.href='dashboard.html'">Back to Dashboard</button>
+</div>
+
+<script>
+async function loadVisitor() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  if (!id) {
+    alert("Invalid visitor id");
+    return;
+  }
+
+  const res = await fetch(`http://localhost:5000/api/visitors/${id}`);
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert("Failed to fetch visitor details");
+    return;
+  }
+
+  const v = data.visitor;
+
+  document.getElementById("vName").innerText = v.name;
+  document.getElementById("vProof").innerText = v.idProof ? v.idProof : "Not Uploaded";
+  document.getElementById("vStatus").innerText = v.status;
+}
+
+loadVisitor();
+</script>
+
+</body>
+</html>  -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Visitor Added Successfully</title>
+
+<style>
+  body {
+    background: #eef1f6;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .card {
+    width: 600px;
+    background: #fff;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    text-align: center;
+    animation: fadeIn .4s ease;
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+
+  .success-check {
+    font-size: 65px;
+    color: #2ecc71;
+    margin-bottom: 10px;
+  }
+
+  .submitted-text {
+    color: #555;
+    margin-bottom: 20px;
+  }
+
+  .photo-circle img {
+    width: 130px;
+    height: 130px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    margin-top: 15px;
+  }
+
+  .info-box {
+    background: #f7f8fc;
+    border: 1px solid #ddd;
+    padding: 18px 25px;
+    border-radius: 14px;
+    text-align: left;
+    margin: 25px 0;
+  }
+
+  .info-box p {
+    font-size: 16px;
+    margin: 6px 0;
+  }
+
+  .btn {
+    padding: 14px 20px;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-print { background: #45509a; color: #fff; }
+  .btn-download { background: #45509a; color: #fff; }
+  .btn-dashboard { background:#45509a; border: 2px solid #ccc; }
+
+  .status-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    background: #ffe8a3;
+    color: #8a6d00;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="success-check">✔️</div>
+  <h2>Form Submitted Successfully!</h2>
+  <!-- <p class="submitted-text1">when host approves form pass is generated</p> -->
+  <p class="submitted-text">Your visitor details have been recorded.When host approves U will get mail.</p>
+
+  <!-- Photo Area -->
+  <div class="photo-circle" id="photoBox"></div>
+
+  <!-- Visitor Details -->
+  <div class="info-box">
+    <p><strong>Name:</strong> <span id="vName">Loading...</span></p>
+    <p><strong>Company:</strong> <span id="vCompany">Loading...</span></p>
+    <p><strong>Host:</strong> <span id="vHost">Loading...</span></p>
+    <p><strong>Status:</strong> <span class="status-tag" id="vStatus">Loading...</span></p>
+  </div>
+
+  <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+  <button class="btn btn-dashboard" onclick="location.href='index.html'">← Back to Dashboard</button>
+
+</div>
+
+<script>
+async function loadVisitor() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  if (!id) {
+    alert("Invalid visitor ID");
+    return;
+  }
+
+  const res = await fetch(`http://localhost:5000/api/visitors/${id}`);
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert("Unable to load visitor details");
+    return;
+  }
+
+  const v = data.visitor;
+
+  document.getElementById("vName").innerText = v.name;
+  document.getElementById("vCompany").innerText = v.visitingCompany?.companyName || "N/A";
+  document.getElementById("vHost").innerText = v.visitingPerson?.name || "N/A";
+  document.getElementById("vStatus").innerText = v.status;
+
+  if (v.photo) {
+    document.getElementById("photoBox").innerHTML = `
+      <img src="http://localhost:5000/uploads/${v.photo}" alt="Visitor Photo">
+    `;
+  }
+}
+
+function downloadPass() {
+  alert("you will get pass wait.....");
+}
+
+loadVisitor();
+</script>
+
+</body>
+</html>
