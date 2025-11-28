@@ -47,5 +47,5 @@ The system includes **Admin**, **Host**, and **Visitor** modules — ensuring se
 
 ---
 
-## ⚙️ Project Structure
+
 
